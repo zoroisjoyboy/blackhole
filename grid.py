@@ -23,8 +23,23 @@ class Grid:
                 raise ValueError(f"The length of generated row must match the length of column ({self._c})")
             self.grid = np.vstack((self.grid, new_row))
 
-    def update(self, direction) -> None: # call vstack or hstack depending on direction 
-        pass
+    def update(self, direction) -> None: # 1 up, -1 down, 2 left, -2 right 
+        if direction == 1 or direction == -1:
+            new_row = self._gen_stars(self._c)
+            if direction == 1:
+                self.grid = np.vstack((new_row, self.grid))
+                self.grid = np.delete(self.grid, (self._r - 1), axis = 0)
+            else:
+                self.grid = np.vstack((self.grid, new_row))
+                self.grid = np.delete(self.grid, (0), axis = 0)
+        else:
+            new_col = self._gen_stars(self._r)
+            if direction == 2:
+                self.grid = np.hstack((new_col[:, np.newaxis], self.grid))
+                self.grid = np.delete(self.grid, (self._c - 1), axis = 1)
+            else:
+                self.grid = np.hstack((self.grid, new_col[:, np.newaxis]))
+                self.grid = np.delete(self.grid, (0), axis = 1)
 
     def random_ascii(self):
         n = np.random.default_rng().integers(97, 122)
