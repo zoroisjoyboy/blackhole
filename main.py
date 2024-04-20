@@ -30,17 +30,15 @@ if __name__ == "__main__":
         keys = pygame.key.get_pressed()
         
         if keys[pygame.K_UP]:
-            center_sqr_y -= 1
+            g.update(1)
         if keys[pygame.K_DOWN]:
-            center_sqr_y += 1
+            g.update(-1)
         if keys[pygame.K_LEFT]:
-            center_sqr_x -= 1
+            g.update(2)
         if keys[pygame.K_RIGHT]:
-            center_sqr_x += 1
+            g.update(-2)
     
         screen.fill("black")
-
-        pygame.draw.rect(screen, (255, 255, 255), (center_sqr_x, center_sqr_y, CELL_SIZE + PADDING * 2, CELL_SIZE + PADDING * 2))
 
         for r in range(len(g.grid)):
             for c in range(len(g.grid[0])):
