@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 class Grid:
     def __init__(self, row: int, col: int) -> None:
@@ -22,6 +23,7 @@ class Grid:
             if len(new_row) != self._c:
                 raise ValueError(f"The length of generated row must match the length of column ({self._c})")
             self.grid = np.vstack((self.grid, new_row))
+        self._gen_blackhole()
 
     def update(self, direction) -> None: # 1 up, -1 down, 2 left, -2 right 
         if direction == 1 or direction == -1:
@@ -47,6 +49,15 @@ class Grid:
     
     def _gen_galaxies(self) -> None:
         pass
+
+    def _gen_blackhole(self) -> None: # mark 3's center circle to represent blackhole
+        center_x, center_y = (self._r // 2, self._c // 2)
+        radius = math.floor(self._r * 1/5) // 2
+
+        for x in range(len(self.grid[0])):
+            for y in range(len(self.grid[1])):
+                if (x - center_x) ** 2 + (y - center_y) ** 2 < radius ** 2:
+                    self.grid[x, y] = 3
 
     def _gen_stars(self, size: int) -> np.array: 
         rng = np.random.default_rng() 
