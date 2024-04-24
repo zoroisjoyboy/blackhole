@@ -24,6 +24,7 @@ class Grid:
                 raise ValueError(f"The length of generated row must match the length of column ({self._c})")
             self.grid = np.vstack((self.grid, new_row))
         self._gen_blackhole()
+        self._gen_galaxies()
 
     def update(self, direction) -> None: # 1 up, -1 down, 2 left, -2 right 
         if direction == 1 or direction == -1:
@@ -48,9 +49,34 @@ class Grid:
         return chr(n)
     
     def _gen_galaxies(self) -> None:
-        pass
+        galaxies_coords = self._rand_coords(2, math.floor(self._r * 2/5))
+        for coords in galaxies_coords:
+            self.grid[coords[0], coords[1]] = 2
+        
+        def adj_helper(coord_row: list, coord_col: list) -> int:
+            curr_row, curr_col = coord_row, coord_col
+            length = 0
+            while 0 <= curr_row < len(self.grid) and 0 <= coord_col < len(self.grid[0]) and length <= np.random.randint(self._r * 0.10, self._r * 50):    
+                directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (-1, -1), (-1, 1), (1, 1), (1, -1)]
+                rand_directions = [np.random.choice(move) for move in directions]
+                next_row = curr_row + rand_directions[0]
+                next_col = curr_col + rand_directions[1]
 
-    def _gen_blackhole(self) -> None: # mark 3's center circle to represent blackhole
+                if 0 <= next_row < len(self.grid) and 0 <= next_col < len(self.grid[0]):
+                    curr_row, curr_col = next_row, next_col
+                    self.grid[curr_row, curr_col] = 2
+                    length += 1
+                else:
+                    break
+
+            return length
+            
+        coords1, coords2 = galaxies_coords[0], galaxies_coords[1]
+        adj_helper(coords1[0],  coords1[1]), adj_helper(coords2[0], coords2[1])
+
+        # now take the length and build the bulb which dependant on the length
+                                
+    def _gen_blackhole(self) -> None: 
         center_x, center_y = (self._r // 2, self._c // 2)
         radius = math.floor(self._r * 1/5) // 2
 
@@ -72,6 +98,19 @@ class Grid:
                         n_stars -= 1
         return stars_arr
     
+    def _rand_coords(self, n_pairs: int, min_sep: int) -> list: 
+        rng = np.random.default_rng()
+        used_coordinates = []
+        count_pairs = 0
+        
+        while count_pairs < n_pairs:
+            rand_coordate = (rng.integers(0, self._r), rng.integers(0, self._c))
+
+            if all(np.linalg.norm(np.array(used_coord) - np.array(rand_coordate)) >= min_sep for used_coord in used_coordinates):
+                used_coordinates.append(rand_coordate)
+                count_pairs += 1
+        
+        return used_coordinates
 
 
 
