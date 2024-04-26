@@ -23,7 +23,7 @@ class Grid:
             if len(new_row) != self._c:
                 raise ValueError(f"The length of generated row must match the length of column ({self._c})")
             self.grid = np.vstack((self.grid, new_row))
-        self._gen_blackhole()
+        self._gen_blackhole(self._r // 2, self._c // 2)
         self._gen_galaxies()
 
     def update(self, direction) -> None: # 1 up, -1 down, 2 left, -2 right 
@@ -43,6 +43,8 @@ class Grid:
             else:
                 self.grid = np.hstack((self.grid, new_col[:, np.newaxis]))
                 self.grid = np.delete(self.grid, (0), axis = 1)
+        
+        self._gen_blackhole(self._r // 2, self._c // 2)
 
     def random_ascii(self):
         n = np.random.default_rng().integers(97, 122)
@@ -74,10 +76,10 @@ class Grid:
         coords1, coords2 = galaxies_coords[0], galaxies_coords[1]
         adj_helper(coords1[0],  coords1[1]), adj_helper(coords2[0], coords2[1])
 
-        # now take the length and build the bulb which dependant on the length
+        # now take the length and build the bulb which dependant on the length or actually just randomly make thicker esp in the middle by taking length // 2
                                 
-    def _gen_blackhole(self) -> None: 
-        center_x, center_y = (self._r // 2, self._c // 2)
+    def _gen_blackhole(self, x, y) -> None: 
+        center_x, center_y = (x, y)
         radius = math.floor(self._r * 1/5) // 2
 
         for x in range(len(self.grid[0])):
