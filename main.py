@@ -2,6 +2,7 @@ import pygame
 import pygame.freetype
 import time
 import grid
+import blackhole
 
 WINDOW_WIDTH = 1920
 WINDOW_HEIGHT = 1080
@@ -16,9 +17,8 @@ if __name__ == "__main__":
     total_cell_size = CELL_SIZE + PADDING
     pixel_rows = WINDOW_HEIGHT // total_cell_size
     pixel_cols = WINDOW_WIDTH // total_cell_size
-    center_sqr_x = WINDOW_WIDTH // 2
-    center_sqr_y = WINDOW_HEIGHT // 2
     g = grid.Grid(pixel_rows, pixel_cols)
+    b = blackhole.BlackHole(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2, 1/15)
     running = True
 
     g.populate()
@@ -51,9 +51,8 @@ if __name__ == "__main__":
                         myfont.render_to(screen, (x, y), chr(115), (255, 236, 236)) # color changes based off red shift or blue shift
                     case 2:
                         myfont.render_to(screen, (x, y), chr(103), (255, 236, 236))
-                    case 3:
-                        # screen.fill("black", (x, y, CELL_SIZE, CELL_SIZE))
-                        myfont.render_to(screen, (x, y), "3", (255, 255, 255))        
+                        
+        pygame.draw.circle(screen, "black", (b.x, b.y), b.radius)
                                                                                            
         pygame.display.flip()
         clock.tick(60)

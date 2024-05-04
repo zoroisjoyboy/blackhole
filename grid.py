@@ -23,7 +23,6 @@ class Grid:
             if len(new_row) != self._c:
                 raise ValueError(f"The length of generated row must match the length of column ({self._c})")
             self.grid = np.vstack((self.grid, new_row))
-        self._gen_blackhole(self._r // 2, self._c // 2)
 
     def update(self, direction) -> None: # 1 up, -1 down, 2 left, -2 right 
         n_galaxies = np.random.default_rng().integers(0, 2)
@@ -49,16 +48,14 @@ class Grid:
                 self.grid = np.hstack((self.grid, new_col[:, np.newaxis]))
                 self.grid = np.delete(self.grid, (0), axis = 1)
                 self._gen_galaxies(n_galaxies, [(0, 1), (1, 1), (-1, 1)], -2, len(new_col), self.grid[:, -2], length_flag)
-        
-        self._gen_blackhole(self._r // 2, self._c // 2)
 
-    def random_ascii(self):
+    def random_ascii(self): # have a new instance of 1 or 2 be a new random ascii char
         n = np.random.default_rng().integers(97, 122)
         return chr(n)
 
     def _gen_galaxies(self, n: int, directions: list, move: int, length_new, prior_env: list, length: bool) -> None:
         if not any(element == 2 for element in prior_env):
-            galaxies_coords = self._rand_coords(n, move, math.floor(length_new * 1/5)) # generate rand coords with min sep within the new row/col
+            galaxies_coords = self._rand_coords(n, move, math.floor(length_new * 1/5)) 
             for coords in galaxies_coords:
                 self.grid[coords[0], coords[1]] = 2
         else:
@@ -83,16 +80,7 @@ class Grid:
                         next_col = element_c + rand_directions[1]
                         if 0 <= next_row < self._r and 0 <= next_col < self._c:
                             self.grid[next_row, next_col] = 2
-                                
-    def _gen_blackhole(self, x, y) -> None: 
-        center_x, center_y = (x, y)
-        radius = math.floor(self._r * 1/7) // 2
-
-        for x in range(len(self.grid[0])):
-            for y in range(len(self.grid[1])):
-                if (x - center_x) ** 2 + (y - center_y) ** 2 < radius ** 2:
-                    self.grid[x, y] = 3
-
+                            
     def _gen_stars(self, size: int) -> np.array:
         rng = np.random.default_rng()
         stars_arr = np.zeros(size, dtype=int)
