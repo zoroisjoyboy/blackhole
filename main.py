@@ -1,6 +1,7 @@
 import pygame
 import pygame.freetype
 import time
+import math
 import grid
 import blackhole
 
@@ -8,6 +9,37 @@ WINDOW_WIDTH = 1920
 WINDOW_HEIGHT = 1080
 CELL_SIZE = 7
 PADDING = 1
+
+def generate_objects(screen, grid):
+     for r in range(len(grid)):
+            for c in range(len(grid[0])):
+                x = c * (CELL_SIZE + PADDING) + PADDING
+                y = r * (CELL_SIZE + PADDING) + PADDING  
+                match grid[r][c]:
+                    case 1:
+                        myfont.render_to(screen, (x, y), chr(115), (255, 236, 236)) # color changes based off red shift or blue shift
+                        if b.space_time_range(x, y): # if any coord is in space time enters, then copy once and recopy (removing prior copies) as the object moves closer to event horizon
+                            # if before reaching event horizon, we change directions, particlar object and its copy moves away (removing prior copies) until object leaves space time curve which removes fully copy
+                            # when reaching event horizon, original and copied flip, and as moving apart in space time range, both move apart until existing space time where copied is removed and original is now on the other side of the blackhole
+                            opposite_x = -(math.floor(x - b.x) * 2) + x
+                            opposite_y = -(math.floor(y - b.y) * 2) + y
+                            myfont.render_to(screen, (opposite_x, opposite_y), chr(115), (255, 236, 236))
+                    case 2:
+                        myfont.render_to(screen, (x, y), chr(103), (255, 236, 236))
+                        if b.space_time_range(x, y):
+                            opposite_x = -(math.floor(x - b.x) * 2) + x
+                            opposite_y = -(math.floor(y - b.y) * 2) + y
+                            myfont.render_to(screen, (opposite_x, opposite_y), chr(103), (255, 236, 236))
+
+def move(keys):
+    if keys[pygame.K_UP]:
+            g.update(1)
+    if keys[pygame.K_DOWN]:
+        g.update(-1)
+    if keys[pygame.K_LEFT]:
+        g.update(2)
+    if keys[pygame.K_RIGHT]:
+        g.update(-2)
 
 if __name__ == "__main__":
     pygame.init()
@@ -30,30 +62,17 @@ if __name__ == "__main__":
                 pygame.display.toggle_fullscreen()
 
         keys = pygame.key.get_pressed()
-        
-        if keys[pygame.K_UP]:
-            g.update(1)
-        if keys[pygame.K_DOWN]:
-            g.update(-1)
-        if keys[pygame.K_LEFT]:
-            g.update(2)
-        if keys[pygame.K_RIGHT]:
-            g.update(-2)
-    
-        screen.fill("black")
+        move(keys)
 
-        for r in range(len(g.grid)):
-            for c in range(len(g.grid[0])):
-                x = c * (CELL_SIZE + PADDING) + PADDING
-                y = r * (CELL_SIZE + PADDING) + PADDING     
-                match g.grid[r][c]:
-                    case 1:
-                        myfont.render_to(screen, (x, y), chr(115), (255, 236, 236)) # color changes based off red shift or blue shift
-                    case 2:
-                        myfont.render_to(screen, (x, y), chr(103), (255, 236, 236))
+        screen.fill("black")
+        generate_objects(screen, g.grid)
+
+        # if b.event_horizon_range(x, y):
+        #     print("Coordinate ({}, {}) is within the event horizon range of the black hole.".format(x, y))  
                         
+        # pygame.draw.circle(screen, "white", (b.x, b.y), b.curve)
         pygame.draw.circle(screen, "black", (b.x, b.y), b.radius)
-                                                                                           
+                                                             
         pygame.display.flip()
         clock.tick(60)
     
