@@ -5,13 +5,11 @@ import math
 import grid
 import blackhole
 
-WINDOW_WIDTH = 1920
-WINDOW_HEIGHT = 1080
 CELL_SIZE = 7
 PADDING = 1
 
 def generate_objects(screen, grid):
-     for r in range(len(grid)):
+    for r in range(len(grid)):
             for c in range(len(grid[0])):
                 x = c * (CELL_SIZE + PADDING) + PADDING
                 y = r * (CELL_SIZE + PADDING) + PADDING  
@@ -21,15 +19,13 @@ def generate_objects(screen, grid):
                         if b.space_time_range(x, y): # if any coord is in space time enters, then copy once and recopy (removing prior copies) as the object moves closer to event horizon
                             # if before reaching event horizon, we change directions, particlar object and its copy moves away (removing prior copies) until object leaves space time curve which removes fully copy
                             # when reaching event horizon, original and copied flip, and as moving apart in space time range, both move apart until existing space time where copied is removed and original is now on the other side of the blackhole
-                            opposite_x = -(math.floor(x - b.x) * 2) + x
-                            opposite_y = -(math.floor(y - b.y) * 2) + y
-                            myfont.render_to(screen, (opposite_x, opposite_y), chr(115), (255, 236, 236))
+                            copied_x, copied_y = b.copied_object(x, y)
+                            myfont.render_to(screen, (copied_x, copied_y), chr(115), (255, 236, 236))
                     case 2:
                         myfont.render_to(screen, (x, y), chr(103), (255, 236, 236))
                         if b.space_time_range(x, y):
-                            opposite_x = -(math.floor(x - b.x) * 2) + x
-                            opposite_y = -(math.floor(y - b.y) * 2) + y
-                            myfont.render_to(screen, (opposite_x, opposite_y), chr(103), (255, 236, 236))
+                            copied_x, copied_y = b.copied_object(x, y)
+                            myfont.render_to(screen, (copied_x, copied_y), chr(103), (255, 236, 236))
 
 def move(keys):
     if keys[pygame.K_UP]:
@@ -43,14 +39,17 @@ def move(keys):
 
 if __name__ == "__main__":
     pygame.init()
-    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.RESIZABLE) # fill screen, dynamic window implement
+    info = pygame.display.Info()
+    display_width = info.current_w
+    display_height = info.current_h
+    screen = pygame.display.set_mode((display_width, display_height), pygame.RESIZABLE) # fill screen, dynamic window implement
     myfont = pygame.freetype.Font(None, CELL_SIZE + PADDING)
     clock = pygame.time.Clock()
     total_cell_size = CELL_SIZE + PADDING
-    pixel_rows = WINDOW_HEIGHT // total_cell_size
-    pixel_cols = WINDOW_WIDTH // total_cell_size
+    pixel_rows = display_height // total_cell_size
+    pixel_cols = display_width // total_cell_size
     g = grid.Grid(pixel_rows, pixel_cols)
-    b = blackhole.BlackHole(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2, 1/15)
+    b = blackhole.BlackHole(display_width // 2, display_height // 2, 1/15)
     running = True
 
     g.populate()
