@@ -19,9 +19,8 @@ def generate_objects(screen, grid):
                         if b.space_time_range(x, y): # if any coord is in space time enters, then copy once and recopy (removing prior copies) as the object moves closer to event horizon
                             # if before reaching event horizon, we change directions, particlar object and its copy moves away (removing prior copies) until object leaves space time curve which removes fully copy
                             # when reaching event horizon, original and copied flip, and as moving apart in space time range, both move apart until existing space time where copied is removed and original is now on the other side of the blackhole
-                            opposite_x = -(math.floor(x - b.x) * 2) + x
-                            opposite_y = -(math.floor(y - b.y) * 2) + y
-                            myfont.render_to(screen, (opposite_x, opposite_y), chr(115), (255, 236, 236))
+                            copied_x, copied_y = b.copied_object(x, y)
+                            myfont.render_to(screen, (copied_x, copied_y), chr(115), (255, 236, 236))
                     case 2:
                         myfont.render_to(screen, (x, y), chr(103), (255, 236, 236))
                         if b.space_time_range(x, y):
