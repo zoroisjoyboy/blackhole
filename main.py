@@ -23,7 +23,7 @@ def generate_objects(screen, grid):
                             # when reaching event horizon, original and copied flip, and as moving apart in space time range, both move apart until existing space time where copied is removed and original is now on the other side of the blackhole
                             opposite_x = -(math.floor(x - b.x) * 2) + x
                             opposite_y = -(math.floor(y - b.y) * 2) + y
-                            myfont.render_to(screen, (opposite_x, opposite_y), chr(115), (255, 236, 236))
+                            myfont.render_to(screen, (opposite_x, opposite_y), chr(115), (255, 236, 236)) # copy others to mimic original and have them to warped and other side warped depending on angle from center 
                     case 2:
                         myfont.render_to(screen, (x, y), chr(103), (255, 236, 236))
                         if b.space_time_range(x, y):
