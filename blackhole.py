@@ -1,5 +1,6 @@
 import math
 import grid 
+import pygame
 
 class BlackHole():
     def __init__(self, x, y, prop) -> None:
@@ -17,33 +18,35 @@ class BlackHole():
         return distance_squared <= self.radius ** 2
     
     def copied_object(self, x, y):
-        angle_radians = math.atan2(y - self.y, x - self.x) # 2 sets of pivot points, if moving left/right then pi/2 if up and down 0/pi
-        print(angle_radians)
-        diff = math.pi / 2 - angle_radians
-        change_x_angle = 0
-        change_y_angle = 0
-        scale_x = 0.3
-        scale_y = 0.1
+        
+        distance = math.sqrt((x - self.x)**2 + (y - self.y)**2)
+
         copied_x = -(math.floor(x - self.x) * 2) + x
         copied_y = -(math.floor(y - self.y) * 2) + y
-        
-        if angle_radians > 0 and angle_radians < math.pi / 2: # Q1
-            copied_x += -scale_x * math.cos(diff)
-            copied_y += scale_y * math.sin(diff)
-        elif angle_radians > math.pi / 2 and angle_radians < math.pi: # Q2
-            copied_x += scale_x * math.cos(diff)
-            copied_y += scale_y * math.sin(diff)
-        elif angle_radians < -math.pi / 2 and angle_radians > -math.pi: # Q3
-            copied_x += scale_x * math.cos(diff)
-            copied_y += -scale_y * math.sin(diff)
-        elif angle_radians < 0 and angle_radians > -math.pi / 2: # Q4
-            copied_x += -scale_x * math.cos(diff)
-            copied_y += -scale_y * math.sin(diff)
 
-        print(copied_x, copied_y)
+        angle = math.atan2(y - self.y, x - self.x)
+
+        if x >= 0 and y >= 0:  # Q1
+            pivot_angle = 0
+        elif x < 0 and y >= 0:  # Q2
+            pivot_angle = math.pi
+        elif x < 0 and y < 0:  # Q3
+            pivot_angle = math.pi
+        else:  # Q4
+            pivot_angle = 0
+
+        angle_delta = (distance / self.radius) * math.pi 
+        if angle < pivot_angle:
+            angle += angle_delta
+        elif angle > pivot_angle:
+            angle -= angle_delta
+
+        copied_x += self.radius * math.cos(angle) 
+        copied_y += self.radius * math.sin(angle) 
+        
         return copied_x, copied_y
-        
 
-    
+
+  
     
     

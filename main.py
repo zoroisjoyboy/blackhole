@@ -8,7 +8,7 @@ import blackhole
 CELL_SIZE = 7
 PADDING = 1
 
-def generate_objects(screen, grid):
+def generate_objects(screen, grid, keys):
     for r in range(len(grid)):
             for c in range(len(grid[0])):
                 x = c * (CELL_SIZE + PADDING) + PADDING
@@ -64,7 +64,7 @@ if __name__ == "__main__":
         move(keys)
 
         screen.fill("black")
-        generate_objects(screen, g.grid)
+        generate_objects(screen, g.grid, keys)
 
         # if b.event_horizon_range(x, y):
         #     print("Coordinate ({}, {}) is within the event horizon range of the black hole.".format(x, y))  
