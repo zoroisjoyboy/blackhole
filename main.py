@@ -18,6 +18,9 @@ PADDING = 1
 
 pygame.display.set_caption("Warphole")
 
+def get_font(size): 
+    return pygame.font.Font("assets/fonts/MinecraftBold-nMK1.otf", size)
+
 def play():
     def generate_objects(screen, grid):
         for r in range(len(grid)):
@@ -75,7 +78,7 @@ def play():
     while running:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.QUIT:
-                #exit()
+                exit()
                 running = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_F11:
                 toggle_fullscreen()
@@ -90,15 +93,12 @@ def play():
                                                              
         pygame.display.flip()
         clock.tick(60)
+
+        pygame.display.update()
     
     pygame.quit()
 
-def main_menu():
-    def get_font(size): 
-        return pygame.font.Font("assets/fonts/MinecraftBold-nMK1.otf", size)
-    
-    SCREEN.fill("black")
-    
+def main_menu():    
     video = cv2.VideoCapture("assets/menu_clip.mp4")
     pygame.mixer.music.load("assets/music/invincible_theme_8bit.mp3")
     pygame.mixer.music.play(-1)
@@ -112,6 +112,7 @@ def main_menu():
 
     while run: 
         clock.tick(fps)
+        SCREEN.fill("black")
         menu_mouse_pos = pygame.mouse.get_pos()
 
         success, video_image = video.read()
@@ -165,14 +166,58 @@ def main_menu():
                     if quit_button.checkForInput(menu_mouse_pos):
                         pygame.quit()
                         sys.exit()
+
+            pygame.display.update()
         
     pygame.quit()
 
 def exit():
-    pass
+    while True:
+        SCREEN.fill("black")
+        menu_mouse_pos = pygame.mouse.get_pos()
+
+        main_menu_button = Button(image=pygame.image.load("assets/shapes/play_rect.png"), pos=(WINDOWED_WIDTH // 2, 700), 
+                            text_input="Return to Menu", font=get_font(40), base_color="#d7fcd4", hovering_color="White")
+        for button in [main_menu_button]:
+                button.changeColor(menu_mouse_pos)
+                button.update(SCREEN)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if main_menu_button.checkForInput(menu_mouse_pos):
+                    main_menu()
+        
+        pygame.display.update()
 
 def options():
-    pass
+    
+    while True:
+        SCREEN.fill("black")
+        font = get_font(90)
+
+        menu_mouse_pos = pygame.mouse.get_pos()
+        title_surf = font.render('Warphole Settings', True, (255, 255, 255))
+        title_rect = title_surf.get_rect(center=(WINDOWED_WIDTH // 2, WINDOWED_HEIGHT // 5))
+        SCREEN.blit(title_surf, title_rect)
+
+        save_button = Button(image=pygame.image.load("assets/shapes/play_rect.png"), pos=(WINDOWED_WIDTH // 2, 700), 
+                            text_input="Save", font=get_font(40), base_color="#d7fcd4", hovering_color="White")
+        for button in [save_button]:
+                button.changeColor(menu_mouse_pos)
+                button.update(SCREEN)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if save_button.checkForInput(menu_mouse_pos):
+                    main_menu()
+        
+        pygame.display.update()
 
 if __name__ == "__main__":
     main_menu()
