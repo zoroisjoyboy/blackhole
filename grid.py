@@ -14,9 +14,6 @@ class Grid:
     def __len__(self):
         return len(self.grid)
 
-    def __repr__(self) -> str:
-        pass
-
     def populate(self) -> None:
         for _ in range(self._r):
             new_row = self._gen_stars(self._c)

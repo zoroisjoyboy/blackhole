@@ -1,12 +1,10 @@
 import math
-import grid 
-import pygame
 
 class BlackHole():
     def __init__(self, x, y, prop) -> None:
         self.x = x
         self.y = y
-        self.radius = math.floor(self.x * prop) // 2  # later gamer can change size, the space time bend changes, lensing affect is more intense
+        self.radius = math.floor(self.x * prop) // 2 
         self.curve = self.radius * 2
 
     def space_time_range(self, x, y):
@@ -35,7 +33,7 @@ class BlackHole():
         else:  # Q4
             pivot_angle = 0
 
-        angle_delta = (distance / self.radius) * math.pi 
+        angle_delta = (distance / self.radius) * math.pi
         if angle < pivot_angle:
             angle += angle_delta
         elif angle > pivot_angle:
