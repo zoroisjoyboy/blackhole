@@ -1,4 +1,4 @@
-![Warphole](assets\game_name.JPG)
+![Warphole](.github\game_name.JPG)
 
 ![Demo](assets\warphole.gif)
 
