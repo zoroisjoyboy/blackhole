@@ -1,7 +1,7 @@
 <center>
-![Warphole](assets\game_name.JPG)
+![Warphole](assets/game_name.JPG)
 
-![Demo](assets\warphole.gif)
+![Demo](assets/warphole.gif)
 </center>
 
 ### Description
