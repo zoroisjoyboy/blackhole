@@ -3,6 +3,7 @@ import os, sys
 import cv2
 import grid, blackhole
 from button import Button
+from slider import Slider
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 pygame.init()
@@ -16,10 +17,33 @@ MASS = 1/15
 CELL_SIZE = 7
 PADDING = 1
 
-pygame.display.set_caption("Warphole")
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
 
-def get_font(size): 
-    return pygame.font.Font("assets/fonts/MinecraftBold-nMK1.otf", size)
+    return os.path.join(base_path, relative_path)
+
+pygame.display.set_caption("Warphole")
+icon_path = resource_path("assets\\icon.png")
+icon = pygame.image.load(icon_path)
+pygame.display.set_icon(icon)
+shapes_path = resource_path("assets\\shapes\\rect.png")
+
+def get_font(size):
+    font_path = resource_path("assets\\fonts\\MinecraftBold-nMK1.otf")
+    return pygame.font.Font(font_path, size)
+
+def adjust_font_size(font_size, font_rev):
+    if font_size == 150 or font_rev:
+        font_size -= 1
+        font_rev = True
+        if font_size == 90:
+            font_rev = False
+    else:
+        font_size += 1
+    return font_size, font_rev
 
 def play():
     def generate_objects(screen, grid):
@@ -77,9 +101,12 @@ def play():
     g.populate()
     while running:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.QUIT:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 exit()
                 running = False
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_F11:
                 toggle_fullscreen()
 
@@ -99,8 +126,10 @@ def play():
     pygame.quit()
 
 def main_menu():    
-    video = cv2.VideoCapture("assets/menu_clip.mp4")
-    pygame.mixer.music.load("assets/music/invincible_theme_8bit.mp3")
+    video_path = resource_path("assets\\menu_clip.mp4") 
+    video = cv2.VideoCapture(video_path)
+    music_path = resource_path("assets\\music\\invincible_theme_8bit.mp3")
+    pygame.mixer.music.load(music_path)
     pygame.mixer.music.play(-1)
     success, video_image = video.read()
     fps = video.get(cv2.CAP_PROP_FPS)
@@ -130,25 +159,18 @@ def main_menu():
             title_rect = title_surf.get_rect(center=(WINDOWED_WIDTH // 2, WINDOWED_HEIGHT // 5))
             SCREEN.blit(title_surf, title_rect)
 
-            play_button = Button(image=pygame.image.load("assets/shapes/play_rect.png"), pos=(WINDOWED_WIDTH // 2, 700), 
+            play_button = Button(image=pygame.image.load(shapes_path), pos=(WINDOWED_WIDTH // 2, 700), 
                             text_input="PLAY", font=get_font(40), base_color="#d7fcd4", hovering_color="White")
-            options_button = Button(image=pygame.image.load("assets/shapes/options_rect.png"), pos=(WINDOWED_WIDTH // 2, 800), 
+            options_button = Button(image=pygame.image.load(shapes_path), pos=(WINDOWED_WIDTH // 2, 800), 
                                 text_input="OPTIONS", font=get_font(40), base_color="#d7fcd4", hovering_color="White")
-            quit_button = Button(image=pygame.image.load("assets/shapes/quit_rect.png"), pos=(WINDOWED_WIDTH // 2, 900), 
+            quit_button = Button(image=pygame.image.load(shapes_path), pos=(WINDOWED_WIDTH // 2, 900), 
                                 text_input="QUIT", font=get_font(40), base_color="#d7fcd4", hovering_color="White")
 
             for button in [play_button, options_button, quit_button]:
                 button.changeColor(menu_mouse_pos)
                 button.update(SCREEN)
 
-            if font_size == 150 or font_rev:
-                font_size -= 1
-                font_rev = True
-                if font_size == 90:
-                    font_rev = False
-            else:
-                font_size += 1
-
+            font_size, font_rev = adjust_font_size(font_size, font_rev)
             font = get_font(font_size)
                 
             pygame.display.flip()
@@ -170,14 +192,22 @@ def main_menu():
             pygame.display.update()
         
     pygame.quit()
+    sys.exit()
 
 def exit():
+    SCREEN = pygame.display.set_mode((WINDOWED_WIDTH, WINDOWED_HEIGHT)) 
     while True:
         SCREEN.fill("black")
-        menu_mouse_pos = pygame.mouse.get_pos()
+        font = get_font(90)
 
-        main_menu_button = Button(image=pygame.image.load("assets/shapes/play_rect.png"), pos=(WINDOWED_WIDTH // 2, 700), 
+        menu_mouse_pos = pygame.mouse.get_pos()
+        title_surf = font.render('Leave?', True, (255, 255, 255))
+        title_rect = title_surf.get_rect(center=(WINDOWED_WIDTH // 2, WINDOWED_HEIGHT // 5))
+        SCREEN.blit(title_surf, title_rect)
+
+        main_menu_button = Button(image=pygame.image.load(shapes_path), pos=(WINDOWED_WIDTH // 2, 700), 
                             text_input="Return to Menu", font=get_font(40), base_color="#d7fcd4", hovering_color="White")
+        
         for button in [main_menu_button]:
                 button.changeColor(menu_mouse_pos)
                 button.update(SCREEN)
@@ -189,21 +219,38 @@ def exit():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if main_menu_button.checkForInput(menu_mouse_pos):
                     main_menu()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                play()
         
         pygame.display.update()
 
 def options():
-    
+    global MASS
+    b = blackhole.BlackHole(WINDOWED_WIDTH // 2, WINDOWED_HEIGHT * 0.65, MASS)
+    slider = Slider(WINDOWED_WIDTH // 2 - 150, WINDOWED_HEIGHT // 2.5, 300, 40, 30, 10, 20)
+    clock = pygame.time.Clock()
+    font_rev = False
+    font_size = 90
+    font = get_font(font_size)
     while True:
         SCREEN.fill("black")
-        font = get_font(90)
-
+        clock.tick(30)
         menu_mouse_pos = pygame.mouse.get_pos()
         title_surf = font.render('Warphole Settings', True, (255, 255, 255))
         title_rect = title_surf.get_rect(center=(WINDOWED_WIDTH // 2, WINDOWED_HEIGHT // 5))
         SCREEN.blit(title_surf, title_rect)
 
-        save_button = Button(image=pygame.image.load("assets/shapes/play_rect.png"), pos=(WINDOWED_WIDTH // 2, 700), 
+        font_size, font_rev = adjust_font_size(font_size, font_rev)
+        font = get_font(font_size)
+
+        slider.draw(SCREEN)
+        new_mass = slider.get_value()
+        b = blackhole.BlackHole(WINDOWED_WIDTH // 2, WINDOWED_HEIGHT * 0.65, 1/new_mass)
+
+        pygame.draw.circle(SCREEN, "White", (b.x, b.y), b.curve)
+        pygame.draw.circle(SCREEN, "black", (b.x, b.y), b.radius)
+
+        save_button = Button(image=pygame.image.load(shapes_path), pos=(WINDOWED_WIDTH // 2, 900), 
                             text_input="Save", font=get_font(40), base_color="#d7fcd4", hovering_color="White")
         for button in [save_button]:
                 button.changeColor(menu_mouse_pos)
@@ -215,7 +262,9 @@ def options():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if save_button.checkForInput(menu_mouse_pos):
+                    MASS = 1/new_mass
                     main_menu()
+            slider.handle_event(event)
         
         pygame.display.update()
 

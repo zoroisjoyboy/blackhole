@@ -45,11 +45,7 @@ class Grid:
                 self.grid = np.hstack((self.grid, new_col[:, np.newaxis]))
                 self.grid = np.delete(self.grid, (0), axis = 1)
                 self._gen_galaxies(n_galaxies, [(0, 1), (1, 1), (-1, 1)], -2, len(new_col), self.grid[:, -2], length_flag)
-
-    def random_ascii(self): # have a new instance of 1 or 2 be a new random ascii char
-        n = np.random.default_rng().integers(97, 122)
-        return chr(n)
-
+                
     def _gen_galaxies(self, n: int, directions: list, move: int, length_new, prior_env: list, length: bool) -> None:
         if not any(element == 2 for element in prior_env):
             galaxies_coords = self._rand_coords(n, move, math.floor(length_new * 1/5)) 
